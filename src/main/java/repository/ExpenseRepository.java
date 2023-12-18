@@ -2,22 +2,22 @@ package repository;
 
 import Excepcions.RepositoryExepcion;
 import domain.categories.ExpenseCategory;
-import dto.ExpenseDto;
+import dto.Expense;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public interface ExpenseRepository {
+        Integer insert(Expense expense);
 
-        ExpenseCategory getExpenseCategoryById(int id) throws SQLException;
-        ExpenseDto getExpenseById(int id);
-        List<ExpenseDto> getAllExpenses() throws RepositoryExepcion;
+/*        ExpenseCategory getExpenseCategoryById(int id) throws SQLException;
+        Expense getExpenseById(int id);
 
-        void addExpense(ExpenseDto expenseDto);
+        List<Expense> getAllExpenses() throws RepositoryExepcion;
 
-        void updateExpense(ExpenseDto expenseDto);
+        void updateExpense(Expense expense);
 
-        void deleteExpense(int id);
+        void deleteExpense(int id);*/
     }
 
 

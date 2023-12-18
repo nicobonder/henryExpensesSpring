@@ -3,12 +3,14 @@ package repository;
 import Excepcions.RepositoryExepcion;
 import domain.categories.ExpenseCategory;
 import dto.ExpenseCategoryDto;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Repository
 public class CategoryRepositoryImpl implements CategoryRepository {
     private static final String GET_CATEGORY_BY_NAME = "SELECT * FROM expenseCategory WHERE categoryName = ?";
 
@@ -31,7 +33,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return new ExpenseCategory(
-                        resultSet.getInt("id"),
+                        resultSet.getLong("id"),
                         resultSet.getString("categoryName")
                 );
             }

@@ -2,35 +2,69 @@ package repository;
 
 import Excepcions.RepositoryExepcion;
 import domain.categories.ExpenseCategory;
-import domain.expenses.Expense;
-import dto.ExpenseDto;
+import dto.Expense;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+@Repository
 public class ExpenseRepositoryImpl implements ExpenseRepository {
     //DECLARO TODAS LAS SENTENCIAS SQL QUE VOY A USAR
 
-    private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
-    private static final String GET_EXPENSE_BY_ID = "SELECT * FROM expense WHERE id = ?";
-    private static final String GET_ALL_EXPENSES = "SELECT * FROM expense";
-    private static final String INSERT_ALL_EXPENSE = "INSERT INTO expense (date, amount, category_id) VALUES (?, ?, ?)";
-    private static final String UPDATE_EXPENSE = "UPDATE expense SET date = ?, amount = ?, category_id = ? WHERE id = ?";
-    private static final String DELETE_EXPENSE = "DELETE FROM expense WHERE id = ?";
+    private static final String INSERT_INTO_EXPENSE = "INSERT INTO Expense (amount, category_id, category_name, date) VALUES (?, ?, ?, ?)";
+    private static final String INSERT_INTO_CATEGORY_EXPENSE = "INSERT INTO ExpenseCategory (name) VALUES (?)";
+    private static final String SELECT_FROM_CATEGORY_EXPENSE_BY_NAME = "SELECT * FROM ExpenseCategory WHERE name = ?";
+    /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
+    private static final String GET_EXPENSE_BY_ID = "SELECT * FROM Expense WHERE id = ?";
+    private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
+    private static final String UPDATE_EXPENSE = "UPDATE Expense SET date = ?, amount = ?, category_id = ? WHERE id = ?";
+    private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";*/
 
-    //GENERO UNA INSTANCIA DE CONEXION PARA USAR LOS METODOS DEL OBJ CONNECTION.
-    private final Connection connection;
+    //Uso JdbcTamplate para conectarme a la DB
+    private final JdbcTemplate jdbcTemplate;
 
-    // SE HACE CON UN CONSTRUCTOR
-    public ExpenseRepositoryImpl(Connection connection) {
-        this.connection = connection;
+    public ExpenseRepositoryImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
+    public Integer insert(Expense expense) {
+       jdbcTemplate.update(INSERT_INTO_CATEGORY_EXPENSE, expense.getCategoryName().toLowerCase());
+        Object[] params = {expense.getCategoryName()};
+        int[] types = {1};
+        ExpenseCategory category = jdbcTemplate.queryForObject(
+            SELECT_FROM_CATEGORY_EXPENSE_BY_NAME,
+                params, types, new ExpenseCategoryRowMapper()
+        );
+        return jdbcTemplate.update(INSERT_INTO_EXPENSE,
+                expense.getAmount(),
+                category.getId(),
+                category.getCategoryName(),
+                expense.getDate());
+    }
+
+    static class ExpenseCategoryRowMapper implements RowMapper<ExpenseCategory> {
+        @Override
+        public ExpenseCategory mapRow(ResultSet rs, int rowNum) throws SQLException {
+           ExpenseCategory expenseCategory = new ExpenseCategory();
+           expenseCategory.setId(rs.getLong("id"));
+           expenseCategory.setCategoryName(rs.getString("name"));
+           return expenseCategory;
+        }
+    }
+
+
+
+
+
+  /*  @Override
     public ExpenseCategory getExpenseCategoryById(int id) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(GET_CATEGORY_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -47,8 +81,8 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     }
 
     @Override
-    public ExpenseDto getExpenseById(int id) {
-        ExpenseDto expenseDto = null;
+    public Expense getExpenseById(int id) {
+        Expense expense = null;
         try (PreparedStatement preparedStatement = connection.prepareStatement(GET_EXPENSE_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -57,55 +91,20 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
                 double amount = resultSet.getDouble("amount");
                 int categoryId = resultSet.getInt("category_id");
                 ExpenseCategory category = getExpenseCategoryById(categoryId);
-                expenseDto = new ExpenseDto(date, amount, category);
+                expense = new Expense(date, amount, category);
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
-        return expenseDto;
-    }
-
-    @Override
-    public void addExpense(ExpenseDto expenseDto) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ALL_EXPENSE)) {
-            //OBTENGO un DTO PERO A LA DB TENGO QUE MANIPULAR UNA ENTIDAD. PARA ESO MAPEO
-            Expense expense = mapDtoToEntity(expenseDto);
-
-            preparedStatement.setString(1, expense.getDate());
-            preparedStatement.setDouble(2, expense.getAmount());
-            preparedStatement.setInt(3, expense.getCategory().getId());
-
-            //Esto devuelve un entero executeUpdate()
-            int affectedRows = preparedStatement.executeUpdate();
-
-            //La uso para hacer una validacion
-            if (affectedRows == 0) {
-                throw new RepositoryExepcion("Error al insertar gasto. Ninguna fila fue afectada");
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        } catch (RepositoryExepcion e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    //Metodo para mapear de Dto a Entity para manipular en la DB
-    private Expense mapDtoToEntity(ExpenseDto expenseDto) {
-        //seteo el Expense con los valores que vienen del Dto
-        Expense expense = new Expense();
-        expense.setDate(expenseDto.getDate());
-        expense.setAmount(expenseDto.getAmount());
-        expense.setCategory(expenseDto.getCategory());
-
         return expense;
     }
 
+
     @Override
-    public List<ExpenseDto> getAllExpenses() throws RepositoryExepcion {
+    public List<Expense> getAllExpenses() throws RepositoryExepcion {
         try (PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_EXPENSES)) {
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<ExpenseDto> expenses = new ArrayList<>();
+            List<Expense> expenses = new ArrayList<>();
             while (resultSet.next()) {
                 //DE LA DB RECUPERO ENTITIES Y QUIERO PASAR A OBJETOS DE TIPO DTO
                 expenses.add(mapResultSetToExpenseDto(resultSet));
@@ -121,16 +120,16 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     }
 
     //Seteo el Dto con los valores que vienen del objeto de la DB
-    private ExpenseDto mapResultSetToExpenseDto(ResultSet resultSet) throws SQLException {
-        ExpenseDto expenseDto = new ExpenseDto();
-        expenseDto.setDate(resultSet.getString("date"));
-        expenseDto.setAmount(resultSet.getDouble("amount"));
-        expenseDto.setCategory(getExpenseCategoryById(resultSet.getInt("category_id")));
-        return expenseDto;
+    private Expense mapResultSetToExpenseDto(ResultSet resultSet) throws SQLException {
+        Expense expense = new Expense();
+        expense.setDate(resultSet.getString("date"));
+        expense.setAmount(resultSet.getDouble("amount"));
+        expense.setCategory(getExpenseCategoryById(resultSet.getInt("category_id")));
+        return expense;
     }
 
     @Override
-    public void updateExpense(ExpenseDto expense) {
+    public void updateExpense(Expense expense) {
         try(PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_EXPENSE)) {
 
             //Expense expense = mapDtoToEntity(expenseDto);
@@ -162,6 +161,6 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
 }

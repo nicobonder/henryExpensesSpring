@@ -5,27 +5,66 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Expense {
-    private static int idCounter = 1;
-    private int id;
+   private Long id;
+   private Double amount;
+   private Integer categoryId;
+   private String categoryName;
+   private String date;
 
-    //variable para registrar fecha
-    private String date;
-    private double amount;
-    private ExpenseCategory category;
+    public Expense() {
+    }
 
-
-    public Expense(String date, double amount, ExpenseCategory category) {
-        this.id = idCounter++;
+    public Expense(Double amount, Integer categoryId, String categoryName, String date) {
         this.amount = amount;
-        this.category = category;
-
-        // Define el formato de fecha
-        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
         this.date = date;
     }
 
-    public Expense() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+}
+
+
+/*
+public Expense() {
         id++;
     }
 
@@ -70,6 +109,4 @@ public class Expense {
                 ", category=" + category
                 ;
     }
-
-}
-
+ */

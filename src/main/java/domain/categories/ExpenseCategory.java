@@ -1,10 +1,10 @@
 package domain.categories;
 
 public class ExpenseCategory {
-    private int id;
+    private Long id;
     private String categoryName;
 
-    public ExpenseCategory(int id, String categoryName) {
+    public ExpenseCategory(Long id, String categoryName) {
         this.id = id;
         this.categoryName = categoryName;
     }
@@ -12,11 +12,11 @@ public class ExpenseCategory {
     public ExpenseCategory() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

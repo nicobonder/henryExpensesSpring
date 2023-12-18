@@ -1,6 +1,6 @@
 package domain.expenses;
 
-import dto.ExpenseDto;
+import dto.Expense;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.Map;
 //Clase para mostrar el total gastado por día
 //Seria una tabla con 2 columnas: dia y monto
 public class DailyExpenses {
-    public static void addDailyExpenses(List<ExpenseDto> expensesList) {
+    public static void addDailyExpenses(List<Expense> expensesList) {
         Map<String, Double> gastosDiarios = new HashMap<>();
 
-        for (ExpenseDto g : expensesList) {
+        for (Expense g : expensesList) {
             String fecha = g.getDate();
             double monto = g.getAmount();
 

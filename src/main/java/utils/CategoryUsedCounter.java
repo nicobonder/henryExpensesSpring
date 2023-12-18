@@ -1,10 +1,10 @@
 package utils;
 
-import dto.ExpenseDto;
+import dto.Expense;
 
 import java.util.List;
 
 @FunctionalInterface
 public interface CategoryUsedCounter {
-    void countCategoryUsed(List<ExpenseDto> expenses);
+    void countCategoryUsed(List<Expense> expenses);
 }
