@@ -1,4 +1,4 @@
-package Excepcions;
+package com.Henry.Expenses.Excepcions;
 
 import java.sql.SQLException;
 

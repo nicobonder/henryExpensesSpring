@@ -1,6 +1,5 @@
-package domain.expenses;
+package com.Henry.Expenses.domain.expenses;
 
-import domain.categories.ExpenseCategory;
 import org.springframework.stereotype.Component;
 
 @Component

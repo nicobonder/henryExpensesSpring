@@ -1,4 +1,4 @@
-package dto;
+package com.Henry.Expenses.dto;
 
 public class ExpenseCategoryDto {
     private String categoryName;

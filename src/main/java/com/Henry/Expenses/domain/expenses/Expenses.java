@@ -1,4 +1,4 @@
-package domain.expenses;
+package com.Henry.Expenses.domain.expenses;
 
 import org.springframework.stereotype.Component;
 

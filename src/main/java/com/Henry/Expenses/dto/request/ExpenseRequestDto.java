@@ -1,4 +1,4 @@
-package dto.request;
+package com.Henry.Expenses.dto.request;
 
 public class ExpenseRequestDto {
     private Double amount;

@@ -1,4 +1,4 @@
-package domain.categories;
+package com.Henry.Expenses.domain.categories;
 
 import java.util.ArrayList;
 import java.util.List;

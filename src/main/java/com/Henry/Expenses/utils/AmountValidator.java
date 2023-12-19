@@ -1,6 +1,6 @@
-package utils;
+package com.Henry.Expenses.utils;
 
-import Excepcions.InvalidAmountExcepcion;
+import com.Henry.Expenses.Excepcions.InvalidAmountExcepcion;
 
 @FunctionalInterface
     public interface AmountValidator {

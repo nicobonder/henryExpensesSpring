@@ -1,6 +1,6 @@
-package utils;
+package com.Henry.Expenses.utils;
 
-import dto.Expense;
+import com.Henry.Expenses.dto.Expense;
 
 import java.util.List;
 

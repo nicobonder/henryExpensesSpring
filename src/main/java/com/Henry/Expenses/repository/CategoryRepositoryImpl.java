@@ -1,8 +1,9 @@
-package repository;
+/*
+package com.Henry.Expenses.repository;
 
-import Excepcions.RepositoryExepcion;
-import domain.categories.ExpenseCategory;
-import dto.ExpenseCategoryDto;
+import com.Henry.Expenses.Excepcions.RepositoryExepcion;
+import com.Henry.Expenses.domain.categories.ExpenseCategory;
+import com.Henry.Expenses.dto.ExpenseCategoryDto;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -49,3 +50,4 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
 
 }
+*/

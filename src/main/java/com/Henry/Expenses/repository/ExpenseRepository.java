@@ -1,14 +1,14 @@
-package repository;
+package com.Henry.Expenses.repository;
 
-import Excepcions.RepositoryExepcion;
-import domain.categories.ExpenseCategory;
-import dto.Expense;
+import com.Henry.Expenses.dto.Expense;
 
-import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface ExpenseRepository {
         Integer insert(Expense expense);
+        ArrayList<Expense> getAll();
+
+        Expense getById(Long id);
 
 /*        ExpenseCategory getExpenseCategoryById(int id) throws SQLException;
         Expense getExpenseById(int id);

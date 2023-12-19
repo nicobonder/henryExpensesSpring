@@ -1,6 +1,4 @@
-package dto;
-
-import domain.categories.ExpenseCategory;
+package com.Henry.Expenses.dto;
 
 public class Expense {
 

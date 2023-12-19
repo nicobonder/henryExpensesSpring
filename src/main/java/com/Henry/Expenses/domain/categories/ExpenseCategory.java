@@ -1,4 +1,4 @@
-package domain.categories;
+package com.Henry.Expenses.domain.categories;
 
 public class ExpenseCategory {
     private Long id;

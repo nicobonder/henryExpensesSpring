@@ -1,18 +1,15 @@
-package repository;
+package com.Henry.Expenses.repository;
 
-import Excepcions.RepositoryExepcion;
-import domain.categories.ExpenseCategory;
-import dto.Expense;
+import com.Henry.Expenses.domain.categories.ExpenseCategory;
+import com.Henry.Expenses.dto.Expense;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 public class ExpenseRepositoryImpl implements ExpenseRepository {
@@ -21,8 +18,11 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     private static final String INSERT_INTO_EXPENSE = "INSERT INTO Expense (amount, category_id, category_name, date) VALUES (?, ?, ?, ?)";
     private static final String INSERT_INTO_CATEGORY_EXPENSE = "INSERT INTO ExpenseCategory (name) VALUES (?)";
     private static final String SELECT_FROM_CATEGORY_EXPENSE_BY_NAME = "SELECT * FROM ExpenseCategory WHERE name = ?";
-    /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
+    private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String GET_EXPENSE_BY_ID = "SELECT * FROM Expense WHERE id = ?";
+
+    /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
+
     private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String UPDATE_EXPENSE = "UPDATE Expense SET date = ?, amount = ?, category_id = ? WHERE id = ?";
     private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";*/
@@ -36,18 +36,65 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
 
     @Override
     public Integer insert(Expense expense) {
-       jdbcTemplate.update(INSERT_INTO_CATEGORY_EXPENSE, expense.getCategoryName().toLowerCase());
-        Object[] params = {expense.getCategoryName()};
-        int[] types = {1};
-        ExpenseCategory category = jdbcTemplate.queryForObject(
-            SELECT_FROM_CATEGORY_EXPENSE_BY_NAME,
-                params, types, new ExpenseCategoryRowMapper()
+        String categoryName = expense.getCategoryName().toLowerCase();
+
+        // Intentar obtener la categoría existente
+        List<ExpenseCategory> categories = jdbcTemplate.query(
+                SELECT_FROM_CATEGORY_EXPENSE_BY_NAME,
+                new Object[]{categoryName},
+                new ExpenseCategoryRowMapper()
         );
-        return jdbcTemplate.update(INSERT_INTO_EXPENSE,
-                expense.getAmount(),
-                category.getId(),
-                category.getCategoryName(),
-                expense.getDate());
+
+        if (categories.isEmpty()) {
+            // La categoría no existe, así que la insertamos
+            jdbcTemplate.update(INSERT_INTO_CATEGORY_EXPENSE, categoryName);
+
+            // Recuperamos la categoría recién insertada
+            categories = jdbcTemplate.query(
+                    SELECT_FROM_CATEGORY_EXPENSE_BY_NAME,
+                    new Object[]{categoryName},
+                    new ExpenseCategoryRowMapper()
+            );
+        }
+
+        // Tomamos el primer resultado (si existe)
+        ExpenseCategory category = categories.isEmpty() ? null : categories.get(0);
+
+        if (category != null) {
+            // Insertamos el gasto utilizando la categoría existente o recién creada
+            return jdbcTemplate.update(INSERT_INTO_EXPENSE,
+                    expense.getAmount(),
+                    category.getId(),
+                    category.getCategoryName(),
+                    expense.getDate());
+        } else {
+            // Manejar el caso de que no se haya encontrado ni insertado la categoría
+            return 0;
+        }
+    }
+
+    @Override
+    public ArrayList<Expense> getAll() {
+        return new ArrayList<>(jdbcTemplate.query(GET_ALL_EXPENSES, new ExpenseRowMapper()));
+    }
+
+    @Override
+    public Expense getById(Long id) {
+        return jdbcTemplate.queryForObject(GET_EXPENSE_BY_ID, new Object[]{id}, new ExpenseRowMapper());
+    }
+
+    public class ExpenseRowMapper implements RowMapper<Expense> {
+        @Override
+        public Expense mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Expense expense = new Expense();
+            expense.setId(rs.getInt("id"));
+            expense.setAmount(rs.getDouble("amount"));
+            expense.setCategoryId(rs.getInt("category_id"));
+            expense.setCategoryName(rs.getString("category_name"));
+            expense.setDate(rs.getString("date"));
+
+            return expense;
+        }
     }
 
     static class ExpenseCategoryRowMapper implements RowMapper<ExpenseCategory> {
