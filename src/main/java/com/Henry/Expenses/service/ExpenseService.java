@@ -12,4 +12,6 @@ public interface ExpenseService {
 
 
     Optional<Expense> getExpenseById(Long id);
+
+    boolean deleteExpenseById(Long id);
 }

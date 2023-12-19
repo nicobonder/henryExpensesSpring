@@ -48,6 +48,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         return Optional.of(expense);
     }
 
+    @Override
+    public boolean deleteExpenseById(Long id) {
+        try {
+            expenseRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
     private Expense mapDtoToExpense(ExpenseRequestDto expenseRequestDto){
         Expense expense = new Expense();
         expense.setAmount(expenseRequestDto.getAmount());

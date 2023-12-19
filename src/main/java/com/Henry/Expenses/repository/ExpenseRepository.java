@@ -10,6 +10,8 @@ public interface ExpenseRepository {
 
         Expense getById(Long id);
 
+    void deleteById(Long id);
+
 /*        ExpenseCategory getExpenseCategoryById(int id) throws SQLException;
         Expense getExpenseById(int id);
 

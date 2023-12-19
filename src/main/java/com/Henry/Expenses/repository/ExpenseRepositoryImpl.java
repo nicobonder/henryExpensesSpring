@@ -20,12 +20,12 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     private static final String SELECT_FROM_CATEGORY_EXPENSE_BY_NAME = "SELECT * FROM ExpenseCategory WHERE name = ?";
     private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String GET_EXPENSE_BY_ID = "SELECT * FROM Expense WHERE id = ?";
+    private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";
 
     /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
 
-    private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String UPDATE_EXPENSE = "UPDATE Expense SET date = ?, amount = ?, category_id = ? WHERE id = ?";
-    private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";*/
+    ;*/
 
     //Uso JdbcTamplate para conectarme a la DB
     private final JdbcTemplate jdbcTemplate;
@@ -81,6 +81,11 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     @Override
     public Expense getById(Long id) {
         return jdbcTemplate.queryForObject(GET_EXPENSE_BY_ID, new Object[]{id}, new ExpenseRowMapper());
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jdbcTemplate.update(DELETE_EXPENSE, id);
     }
 
     public class ExpenseRowMapper implements RowMapper<Expense> {

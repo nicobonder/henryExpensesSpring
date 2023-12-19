@@ -41,4 +41,15 @@ public class ExpenseController {
     public Optional<Expense> getExpenseByIdHandler(@PathVariable("id") Long id) {
         return this.expenseService.getExpenseById(id);
     }
+
+    @DeleteMapping(path = "/{id}")
+    public String deleteExpenseByIdHandler(@PathVariable("id") Long id) {
+        boolean ok = this.expenseService.deleteExpenseById(id);
+
+        if (ok) {
+            return "Se borró el gasto" + id;
+        } else {
+            return "No se pudo borrar el gasto" + id;
+        }
+    }
 }
