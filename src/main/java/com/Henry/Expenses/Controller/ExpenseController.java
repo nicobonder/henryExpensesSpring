@@ -30,6 +30,16 @@ public class ExpenseController {
                     .body(response);
     }
 
+    //Actualizar un gasto
+    @PutMapping(path = "update/{id}")
+    public ResponseEntity<String> updateExpenseHandler(@PathVariable("id") Long id, @RequestBody ExpenseRequestDto expenseRequestDto) {
+        String response = expenseService.updateExpense(id, expenseRequestDto);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
     //Get all expenses
     @GetMapping
     public List<Expense> getAllExpensesHandler() {
@@ -52,4 +62,6 @@ public class ExpenseController {
             return "No se pudo borrar el gasto" + id;
         }
     }
+
+
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 public interface ExpenseRepository {
         Integer insert(Expense expense);
+        Integer update(Long id, Expense expense);
+
         ArrayList<Expense> getAll();
 
         Expense getById(Long id);

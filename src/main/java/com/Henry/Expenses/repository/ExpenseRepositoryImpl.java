@@ -21,10 +21,11 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String GET_EXPENSE_BY_ID = "SELECT * FROM Expense WHERE id = ?";
     private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";
+    private static final String UPDATE_EXPENSE = "UPDATE Expense SET amount = ?, category_name = ?, date = ? WHERE id = ?";
 
     /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
 
-    private static final String UPDATE_EXPENSE = "UPDATE Expense SET date = ?, amount = ?, category_id = ? WHERE id = ?";
+
     ;*/
 
     //Uso JdbcTamplate para conectarme a la DB
@@ -74,6 +75,16 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     }
 
     @Override
+    public Integer update(Long id, Expense expense) {
+        return jdbcTemplate.update(UPDATE_EXPENSE,
+                expense.getAmount(),
+                expense.getCategoryName(),
+                expense.getDate(),
+                id
+                );
+    }
+
+    @Override
     public ArrayList<Expense> getAll() {
         return new ArrayList<>(jdbcTemplate.query(GET_ALL_EXPENSES, new ExpenseRowMapper()));
     }
@@ -94,7 +105,7 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
             Expense expense = new Expense();
             expense.setId(rs.getInt("id"));
             expense.setAmount(rs.getDouble("amount"));
-            expense.setCategoryId(rs.getInt("category_id"));
+            expense.setCategoryId(rs.getLong("category_id"));
             expense.setCategoryName(rs.getString("category_name"));
             expense.setDate(rs.getString("date"));
 

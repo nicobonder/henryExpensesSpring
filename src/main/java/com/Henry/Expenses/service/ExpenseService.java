@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface ExpenseService {
     String createExpense(ExpenseRequestDto expenseRequestDto);
+    String updateExpense(Long id, ExpenseRequestDto expenseRequestDto);
+
     ArrayList<Expense> getAllExpenses();
 
 

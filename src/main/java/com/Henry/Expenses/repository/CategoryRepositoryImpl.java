@@ -1,53 +1,27 @@
 /*
 package com.Henry.Expenses.repository;
 
-import com.Henry.Expenses.Excepcions.RepositoryExepcion;
 import com.Henry.Expenses.domain.categories.ExpenseCategory;
-import com.Henry.Expenses.dto.ExpenseCategoryDto;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 @Repository
 public class CategoryRepositoryImpl implements CategoryRepository {
-    private static final String GET_CATEGORY_BY_NAME = "SELECT * FROM expenseCategory WHERE categoryName = ?";
+    // Otros atributos y constructores
 
-    private final Connection connection;
+    private static final String GET_CATEGORY_BY_NAME = "SELECT * FROM ExpenseCategory WHERE name = ?";
 
-    public CategoryRepositoryImpl(Connection connection) {
-        this.connection = connection;
-    }
+    private final JdbcTemplate jdbcTemplate;
 
-
-    @Override
-    public void insert(ExpenseCategoryDto category) {
-
+    public CategoryRepositoryImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public ExpenseCategory getCategoryById(String categoryName) {
-        try (PreparedStatement statement = connection.prepareStatement(GET_CATEGORY_BY_NAME)) {
-            statement.setString(1, categoryName);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new ExpenseCategory(
-                        resultSet.getLong("id"),
-                        resultSet.getString("categoryName")
-                );
-            }
-            return null;
-        } catch (SQLException e) {
-            try {
-                throw new RepositoryExepcion("Error al obtener la categoria por ID", e);
-            } catch (RepositoryExepcion ex) {
-                throw new RuntimeException(ex);
-            }
-        }
+    public ExpenseCategory getByName(String categoryName) {
+        return jdbcTemplate.queryForObject(GET_CATEGORY_BY_NAME, new Object[]{categoryName}, new ExpenseRepositoryImpl.ExpenseCategoryRowMapper());
     }
 
-
+    // Otros métodos y clases necesarios
 }
 */

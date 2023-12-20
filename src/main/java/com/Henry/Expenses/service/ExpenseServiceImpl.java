@@ -1,5 +1,6 @@
 package com.Henry.Expenses.service;
 
+import com.Henry.Expenses.domain.categories.ExpenseCategory;
 import com.Henry.Expenses.dto.Expense;
 import com.Henry.Expenses.dto.request.ExpenseRequestDto;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,22 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
+    public String updateExpense(Long id, ExpenseRequestDto expenseRequestDto) {
+        String response = "El gasto se actualizó con éxito";
+
+        Expense expense = mapDtoToExpense(expenseRequestDto);
+        Integer responseUpdated = expenseRepository.update(id, expense);
+
+        // Si el update de BD no devolvió ningún registro actualizado, entonces devuelvo un mensaje de error
+        if (responseUpdated.equals(0)) {
+            System.out.println("No se actualizó ningún registro con el id " + id);
+        }
+        System.out.println("Se actualizó el gasto id: " + id);
+        return response;
+    }
+
+
+    @Override
     public ArrayList<Expense> getAllExpenses() {
         ArrayList<Expense> expenses = expenseRepository.getAll();
         if(expenses.size() > 0){
@@ -58,6 +75,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
     }
+
 
     private Expense mapDtoToExpense(ExpenseRequestDto expenseRequestDto){
         Expense expense = new Expense();

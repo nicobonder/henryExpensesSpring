@@ -4,12 +4,12 @@ public class Expense {
 
     private Integer id;
     private double amount;
-    private Integer categoryId;
+    private Long categoryId;
     private String CategoryName;
     private String date;
 
 
-    public Expense(double amount, Integer categoryId, String categoryName, String date) {
+    public Expense(double amount, Long categoryId, String categoryName, String date) {
         this.amount = amount;
         this.categoryId = categoryId;
         CategoryName = categoryName;
@@ -35,11 +35,11 @@ public class Expense {
         this.amount = amount;
     }
 
-    public Integer getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Integer categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
