@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class ExpenseRepositoryImpl implements ExpenseRepository {
@@ -21,12 +22,12 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
     private static final String GET_ALL_EXPENSES = "SELECT * FROM Expense";
     private static final String GET_EXPENSE_BY_ID = "SELECT * FROM Expense WHERE id = ?";
     private static final String DELETE_EXPENSE = "DELETE FROM Expense WHERE id = ?";
-    private static final String UPDATE_EXPENSE = "UPDATE Expense SET amount = ?, category_name = ?, date = ? WHERE id = ?";
+    private static final String UPDATE_EXPENSE_CATEGORYID = "UPDATE Expense SET category_id = ? WHERE id = ?";
 
-    /*private static final String GET_CATEGORY_BY_ID = "SELECT * FROM expenseCategory WHERE id = ?";
+    private static final String UPDATE_EXPENSE = "UPDATE Expense SET amount = ?, date = ? WHERE id = ?";
+    private static final String CATEGORY_NAME = "SELECT category_name FROM Expense WHERE id = ?";
+    private static final String UPDATE_CATEGORY_NAME = "UPDATE Expense SET category_name = ? WHERE id = ?";
 
-
-    ;*/
 
     //Uso JdbcTamplate para conectarme a la DB
     private final JdbcTemplate jdbcTemplate;
@@ -76,13 +77,51 @@ public class ExpenseRepositoryImpl implements ExpenseRepository {
 
     @Override
     public Integer update(Long id, Expense expense) {
-        return jdbcTemplate.update(UPDATE_EXPENSE,
+        // Obtener el nombre actual de la categoría en el gasto
+        String currentCategoryName = jdbcTemplate.queryForObject(
+                CATEGORY_NAME,
+                new Object[]{id},
+                String.class
+        );
+
+        // Verificar si el nombre de la categoría ha cambiado
+        if (!Objects.equals(currentCategoryName, expense.getCategoryName())) {
+            // Actualizar el nombre de la categoría en el gasto
+            jdbcTemplate.update(
+                    UPDATE_CATEGORY_NAME,
+                    expense.getCategoryName(),
+                    id
+            );
+
+            // Intentar obtener la categoría existente con el nuevo nombre
+            List<ExpenseCategory> categories = jdbcTemplate.query(
+                    SELECT_FROM_CATEGORY_EXPENSE_BY_NAME,
+                    new Object[]{expense.getCategoryName()},
+                    new ExpenseCategoryRowMapper()
+            );
+
+            // Tomar el primer resultado (si existe)
+            ExpenseCategory category = categories.isEmpty() ? null : categories.get(0);
+
+            if (category != null) {
+                // Actualizar el ID de la categoría en el gasto
+                jdbcTemplate.update(
+                        UPDATE_EXPENSE_CATEGORYID,
+                        category.getId(),
+                        id
+                );
+            }
+        }
+
+        // Actualizar el resto de los campos en el gasto
+        return jdbcTemplate.update(
+                UPDATE_EXPENSE,
                 expense.getAmount(),
-                expense.getCategoryName(),
                 expense.getDate(),
                 id
-                );
+        );
     }
+
 
     @Override
     public ArrayList<Expense> getAll() {
