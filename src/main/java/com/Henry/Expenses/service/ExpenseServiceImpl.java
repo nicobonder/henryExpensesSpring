@@ -1,5 +1,6 @@
 package com.Henry.Expenses.service;
 
+import com.Henry.Expenses.Excepcions.InvalidAmountException;
 import com.Henry.Expenses.domain.categories.ExpenseCategory;
 import com.Henry.Expenses.dto.Expense;
 import com.Henry.Expenses.dto.request.ExpenseRequestDto;
@@ -21,6 +22,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public String createExpense(ExpenseRequestDto expenseRequestDto) {
+        try {
+            validateAmount(expenseRequestDto.getAmount());
         String response = "El gasto se registró con éxito";
         Expense expense = mapDtoToExpense(expenseRequestDto);
 
@@ -30,6 +33,16 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         return response;
+        }catch (InvalidAmountException e){
+            return "Error: " +  e.getMessage();
+        }
+    }
+
+    private void validateAmount(Double amount) throws InvalidAmountException {
+        // Lógica de validación del monto
+        if (amount == null || amount <= 0) {
+            throw new InvalidAmountException("El monto debe ser un valor positivo.");
+        }
     }
 
     @Override
