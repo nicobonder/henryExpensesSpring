@@ -5,6 +5,9 @@ public class ExpenseRequestDto {
     private ExpenseCategoryRequestDto categoryRequestDto;
     private String date;
 
+    public ExpenseRequestDto() {
+    }
+
     public ExpenseRequestDto(Double amount, ExpenseCategoryRequestDto categoryRequestDto, String date) {
         this.amount = amount;
         this.categoryRequestDto = categoryRequestDto;

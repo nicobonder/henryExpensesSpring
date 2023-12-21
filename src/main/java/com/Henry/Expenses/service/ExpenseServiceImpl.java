@@ -1,13 +1,14 @@
 package com.Henry.Expenses.service;
 
 import com.Henry.Expenses.Excepcions.InvalidAmountException;
-import com.Henry.Expenses.domain.categories.ExpenseCategory;
 import com.Henry.Expenses.dto.Expense;
 import com.Henry.Expenses.dto.request.ExpenseRequestDto;
 import org.springframework.stereotype.Service;
 import com.Henry.Expenses.repository.ExpenseRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,7 +39,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
     }
 
-    private void validateAmount(Double amount) throws InvalidAmountException {
+    public void validateAmount(Double amount) throws InvalidAmountException {
         // Lógica de validación del monto
         if (amount == null || amount <= 0) {
             throw new InvalidAmountException("El monto debe ser un valor positivo.");
@@ -62,13 +63,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
 
     @Override
-    public ArrayList<Expense> getAllExpenses() {
-        ArrayList<Expense> expenses = expenseRepository.getAll();
-        if(expenses.size() > 0){
-            return expenses;
-        }
-        System.out.println("No se encontraron gastos");
-        return null;
+    public List<Expense> getAllExpenses() {
+        List<Expense> expenses = expenseRepository.getAll();
+        return expenses != null ? expenses : Collections.emptyList();
     }
 
     @Override
